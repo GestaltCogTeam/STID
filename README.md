@@ -1,6 +1,6 @@
 # Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting
 
-Code for our CIKM'22 short paper: "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting".
+Code for our CIKM'22 short paper: "[Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting](https://arxiv.org/abs/2208.05233)".
 
 Our code is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. You can also find STID in [BasicTS](https://github.com/zezhishao/BasicTS).
 
