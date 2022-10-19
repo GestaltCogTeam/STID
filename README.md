@@ -65,7 +65,21 @@ Replace `${DATASET_NAME}` with one of `PEMS04`, `PEMS07`, `PEMS08`, and `Electri
 
 <img src="figures/efficiency_and_ablation.png" alt="efficiency and ablation" style="zoom:100%;" />
 
-## 6. More Related Works
+## 6. Citing
+
+```bibtex
+@inproceedings{10.1145/3511808.3557702,
+author = {Shao, Zezhi and Zhang, Zhao and Wang, Fei and Wei, Wei and Xu, Yongjun},
+title = {Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting},
+year = {2022},
+booktitle = {Proceedings of the 31st ACM International Conference on Information & Knowledge Management},
+pages = {4454–4458},
+location = {Atlanta, GA, USA}
+}
+
+```
+
+## 7. More Related Works
 
 - [D2STGNN: Decoupled Dynamic Spatial-Temporal Graph Neural Network for Traffic Forecasting. VLDB'22.](https://github.com/zezhishao/D2STGNN)
 
