@@ -1,10 +1,10 @@
 # Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting
 
+🔥 ***[New Results] We add the performance of STID on large scale MTS dataset.***
+
 Code for our CIKM'22 short paper: "[Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting](https://arxiv.org/abs/2208.05233)".
 
-Our code is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. You can also find STID in [BasicTS](https://github.com/zezhishao/BasicTS).
-
-We recommend you use [BasicTS](https://github.com/zezhishao/BasicTS) to find more baselines and more detailed comparisons.
+Our code is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. You can also find STID in [BasicTS](https://github.com/zezhishao/BasicTS). We strongly recommend you use [BasicTS](https://github.com/zezhishao/BasicTS) to reproduce the performance of STID on any dataset, and find more baselines and more detailed comparisons.
 
 <img src="figures/STID_architecture.png" alt="model archtecture" style="zoom:80%;" />
 
@@ -80,6 +80,8 @@ python stid/run.py --cfg stid/STID_PEMS04.py --gpus '0'
 ## 📈 Experiment Results
 
 <img src="figures/main_results.png" alt="main results" style="zoom:100%;" />
+
+<img src="figures/perf_large_mts.png" alt="main results" style="zoom:100%;" />
 
 <img src="figures/visualizations.png" alt="visualizations" style="zoom:100%;" />
 
