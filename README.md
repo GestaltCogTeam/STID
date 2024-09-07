@@ -1,6 +1,6 @@
 # Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting
 
-🔥 ***[New Results] We add the performance of STID on large scale MTS dataset.***
+🔥 ***[New Results] We added the performance of STID on large scale MTS dataset.***
 
 Code for our CIKM'22 short paper: "[Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting](https://arxiv.org/abs/2208.05233)".
 
