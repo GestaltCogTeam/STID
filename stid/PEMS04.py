@@ -46,7 +46,7 @@ NUM_EPOCHS = 100
 CFG = EasyDict()
 # General settings
 CFG.DESCRIPTION = 'An Example Config'
-CFG.GPU_NUM = 0 # Number of GPUs to use (0 for CPU mode)
+CFG.GPU_NUM = 1 # Number of GPUs to use (0 for CPU mode)
 # Runner
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

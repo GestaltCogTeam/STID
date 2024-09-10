@@ -5,9 +5,7 @@
 Code for our CIKM'22 short paper: "[Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting](https://arxiv.org/abs/2208.05233)".
 
 > [!CAUTION]  
-> STID is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. 
-> **We highly recommend you to reproduce STID and any other MTS forecasting models on any dataset using [BasicTS](https://github.com/zezhishao/BasicTS).**
-> This repo will not be updated frequently, and we will update the code in [BasicTS](https://github.com/zezhishao/BasicTS).
+> STID is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source benchmark for time series forecasting. **We highly recommend reproducing STID and other MTS forecasting models on any dataset using [BasicTS](https://github.com/zezhishao/BasicTS).** This repository will not be updated frequently; instead, updates will be made in [BasicTS](https://github.com/zezhishao/BasicTS).
 
 <img src="figures/STID_architecture.png" alt="model archtecture" style="zoom:80%;" />
 
@@ -32,7 +30,6 @@ stid/${DATASET_NAME}.py    --> Training configs.
 ```
 
 Replace `${DATASET_NAME}` with one of `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, `METR-LA`, `PEMS-BAY`, or any other dataset you want to use.
-
 ## 💿Requirements
 
 The code is built with BasicTS, you can easily install the requirements by (take Python 3.11 + PyTorch 2.3.1 + CUDA 12.1 as an example):
@@ -56,10 +53,8 @@ More details can be found in [BasicTS](https://github.com/GestaltCogTeam/BasicTS
 You can download the `all_data.zip` file from [Google Drive](https://drive.google.com/drive/folders/14EJVODCU48fGK0FkyeVom_9lETh80Yjp?usp=sharing) or [Baidu Netdisk](https://pan.baidu.com/s/1shA2scuMdZHlx6pj35Dl7A?pwd=s2xe). Unzip the files to the `datasets/` directory:
 
 ```bash
-cd /path/to/BasicTS
+cd /path/to/STID # not STID/stid
 unzip /path/to/all_data.zip -d datasets/
-mv datasets/all_data/* datasets/
-rmdir datasets/all_data
 ```
 
 These datasets have been preprocessed and are ready for use.
