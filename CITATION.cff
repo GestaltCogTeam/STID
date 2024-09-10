@@ -1,20 +1,35 @@
 cff-version: 1.2.0
 message: If you use this software, please cite both the article from preferred-citation and the software itself.
-authors: []
-title: "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate\r\n                  Time Series Forecasting"
+authors:
+  - family-names: Shao
+    given-names: Zezhi
+  - family-names: Zhang
+    given-names: Zhao
+  - family-names: Wang
+    given-names: Fei
+  - family-names: Wei
+    given-names: Wei
+  - family-names: Xu
+    given-names: Yongjun
+title: 'Spatial-temporal identity: A simple yet effective baseline for multivariate time series forecasting'
 version: 1.0.0
-url: https://doi.org/10.1145/3511808.3557702
-doi: 10.1145/3511808.3557702
 date-released: '2022-09-10'
 preferred-citation:
-  authors: []
-  title: "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate\r\n                  Time Series Forecasting"
-  doi: 10.1145/3511808.3557702
-  url: https://doi.org/10.1145/3511808.3557702
+  authors:
+    - family-names: Shao
+      given-names: Zezhi
+    - family-names: Zhang
+      given-names: Zhao
+    - family-names: Wang
+      given-names: Fei
+    - family-names: Wei
+      given-names: Wei
+    - family-names: Xu
+      given-names: Yongjun
+  title: 'Spatial-temporal identity: A simple yet effective baseline for multivariate time series forecasting'
   type: conference-paper
   pages: 4454--4458
   year: '2022'
-  collection-title: "Proceedings of the 31st ACM International Conference on Information\r\n                  \\& Knowledge Management, Atlanta, GA, USA, October 17-21, 2022"
+  collection-title: Proceedings of the 31st ACM International Conference on Information \& Knowledge Management
   conference: {}
-  publisher:
-    name: ACM
+  publisher: {}
