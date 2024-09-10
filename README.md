@@ -2,12 +2,17 @@
 
 🔥 ***[New Results] We added the performance of STID on large scale MTS datasets.***
 
+
 Code for our CIKM'22 short paper: "[Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting](https://arxiv.org/abs/2208.05233)".
 
-Our code is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. You can also find STID in [BasicTS](https://github.com/zezhishao/BasicTS). We strongly recommend you use [BasicTS](https://github.com/zezhishao/BasicTS) to reproduce the performance of STID on any dataset, and find more baselines and more detailed comparisons.
+> [!IMPORTANT]  
+> STID is built on [BasicTS](https://github.com/zezhishao/BasicTS), an open-source standard time series forecasting benchmark. 
+> **We highly recommend you to reproduce STID and any other MTS forecasting models on any dataset using [BasicTS](https://github.com/zezhishao/BasicTS).**
+> This repo will not be updated frequently, and we will update the code in [BasicTS](https://github.com/zezhishao/BasicTS)
 
 <img src="figures/STID_architecture.png" alt="model archtecture" style="zoom:80%;" />
 
+> [!NOTE]  
 > Multivariate Time Series (MTS) forecasting plays a vital role in a wide range of applications. Recently, Spatial-Temporal Graph Neural Networks (STGNNs) have become increasingly popular MTS forecasting methods due to their state-of-the-art performance. However, recent STGNN-based methods are becoming more sophisticated with limited performance improvements. This phenomenon motivates us to explore the critical factors of MTS forecasting and design a model that is as powerful as STGNNs, but more concise and efficient. In this paper, we identify the indistinguishability of samples in both spatial and temporal dimensions as a key bottleneck, and propose a simple yet effective baseline for MTS forecasting by attaching Spatial and Temporal IDentity information (STID). STID achieves the best performance and efficiency simultaneously based on simple multi-layer perceptrons (MLPs). These results suggest that by solving the indistinguishability of samples, we can design models more freely, without being limited to STGNNs.
 
 ## 📚 Table of Contents
@@ -17,64 +22,60 @@ basicts   --> The BasicTS, which provides standard pipelines for training MTS fo
 
 datasets  --> Raw datasets and preprocessed data
 
+experiments  --> Training scripts.
+
 figures   --> Some figures used in README.
 
 scripts   --> Data preprocessing scripts.
 
-stid/stid_arch      --> The implementation of STID.
+stid/arch      --> The implementation of STID.
 
-stid/STID_${DATASET_NAME}.py    --> Training configs.
+stid/${DATASET_NAME}.py    --> Training configs.
 ```
 
-Replace `${DATASET_NAME}` with one of `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, `METR-LA`, and `PEMS-BAY`.
+Replace `${DATASET_NAME}` with one of `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, `METR-LA`, `PEMS-BAY`, or any other dataset you want to use.
 
 ## 💿Requirements
 
-The code is built based on Python 3.9, PyTorch 1.10.0, and [EasyTorch](https://github.com/cnstark/easytorch).
-You can install PyTorch following the instruction in [PyTorch](https://pytorch.org/get-started/locally/). For example:
+The code is built with BasicTS, you can easily install the requirements by (take Python 3.11 + PyTorch 2.3.1 + CUDA 12.1 as an example):
 
 ```bash
-pip install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.0 -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-After ensuring that PyTorch is installed correctly, you can install other dependencies via:
-
-```bash
+# Install Python
+conda create -n BasicTS python=3.11
+conda activate BasicTS
+# Install PyTorch
+pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu121
+# Install other dependencies
 pip install -r requirements.txt
 ```
+
+More details can be found in [BasicTS](https://github.com/GestaltCogTeam/BasicTS).
 
 ## 📦 Data Preparation
 
 ### **Download Data**
 
-You can download all the raw datasets at [Google Drive](https://drive.google.com/drive/folders/14EJVODCU48fGK0FkyeVom_9lETh80Yjp) or [Baidu Yun](https://pan.baidu.com/s/10gOPtlC9M4BEjx89VD1Vbw)(password: 6v0a), and unzip them to `datasets/raw_data/`.
-
-### **Data Preprocessing**
+You can download the `all_data.zip` file from [Google Drive](https://drive.google.com/drive/folders/14EJVODCU48fGK0FkyeVom_9lETh80Yjp?usp=sharing) or [Baidu Netdisk](https://pan.baidu.com/s/1shA2scuMdZHlx6pj35Dl7A?pwd=s2xe). Unzip the files to the `datasets/` directory:
 
 ```bash
-cd /path/to/your/project
-python scripts/data_preparation/${DATASET_NAME}/generate_training_data.py
+cd /path/to/BasicTS
+unzip /path/to/all_data.zip -d datasets/
+mv datasets/all_data/* datasets/
+rmdir datasets/all_data
 ```
 
-Replace `${DATASET_NAME}` with one of `METR-LA`, `PEMS-BAY`, `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, or any other supported dataset. The processed data will be placed in `datasets/${DATASET_NAME}`.
-
-Or you can pre-process all datasets by.
-
-```bash
-cd /path/to/your/project
-bash scripts/data_preparation/all.sh
-```
+These datasets have been preprocessed and are ready for use.
 
 ## 🎯 Train STID
 
 ```bash
-python stid/run.py --cfg stid/STID_${DATASET_NAME}.py --gpus '0'
+python experiments/train.py --cfg stid/${DATASET_NAME}.py --gpus '0'
 ```
 
-Replace `${DATASET_NAME}` with one of `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, `METR-LA`, and `PEMS-BAY`, *e.g.*,
+Replace `${DATASET_NAME}` with one of `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`, `METR-LA`, `PEMS-BAY`, or any other dataset you want to use.
 
 ```bash
-python stid/run.py --cfg stid/STID_PEMS04.py --gpus '0'
+python experiments/train.py --cfg stid/PEMS04.py --gpus '0'
 ```
 
 ## 📈 Experiment Results
@@ -93,7 +94,7 @@ python stid/run.py --cfg stid/STID_PEMS04.py --gpus '0'
 
 - [STEP: Pre-training-Enhanced Spatial-Temporal Graph Neural Network For Multivariate Time Series Forecasting. KDD'22.](https://github.com/zezhishao/STEP)
 
-- [BasicTS: An Open Source Standard Time Series Forecasting Benchmark.](https://github.com/zezhishao/BasicTS)
+- [BasicTS: A Fair and Scalable Time Series Forecasting Benchmark and Toolkit.](https://github.com/zezhishao/BasicTS)
 
 ## Citing
 

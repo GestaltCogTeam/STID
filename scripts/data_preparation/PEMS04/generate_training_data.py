@@ -1,163 +1,114 @@
 import os
-import sys
+import json
 import shutil
-import pickle
-import argparse
 
 import numpy as np
 
-from generate_adj_mx import generate_adj_pems04
-# TODO: remove it when basicts can be installed by pip
-sys.path.append(os.path.abspath(__file__ + "/../../../.."))
-from basicts.data.transform import standard_transform
+from generate_adj_mx import generate_adj_pems04 as generate_adj
 
+# Hyperparameters
+dataset_name = 'PEMS04'
+data_file_path = f'datasets/raw_data/{dataset_name}/{dataset_name}.npz'
+graph_file_path = f'datasets/raw_data/{dataset_name}/adj_{dataset_name}.pkl'
+output_dir = f'datasets/{dataset_name}'
+target_channel = [0]  # Target traffic flow channel
+add_time_of_day = True  # Add time of day as a feature
+add_day_of_week = True  # Add day of the week as a feature
+steps_per_day = 288  # Number of time steps per day
+frequency = 1440 // steps_per_day
+domain = 'traffic flow'
+feature_description = [domain, 'time of day', 'day of week']
+regular_settings = {
+    'INPUT_LEN': 12,
+    'OUTPUT_LEN': 12,
+    'TRAIN_VAL_TEST_RATIO': [0.6, 0.2, 0.2],
+    'NORM_EACH_CHANNEL': False,
+    'RESCALE': True,
+    'METRICS': ['MAE', 'RMSE', 'MAPE'],
+    'NULL_VAL': 0.0
+}
 
-def generate_data(args: argparse.Namespace):
-    """Preprocess and generate train/valid/test datasets.
-    Default settings of PEMS04 dataset:
-        - Normalization method: standard norm.
-        - Dataset division: 6:2:2.
-        - Window size: history 12, future 12.
-        - Channels (features): three channels [traffic flow, time of day, day of week]
-        - Target: predict the traffic flow of the future 12 time steps.
-
-    Args:
-        args (argparse): configurations of preprocessing
-    """
-
-    target_channel = args.target_channel
-    future_seq_len = args.future_seq_len
-    history_seq_len = args.history_seq_len
-    add_time_of_day = args.tod
-    add_day_of_week = args.dow
-    output_dir = args.output_dir
-    train_ratio = args.train_ratio
-    valid_ratio = args.valid_ratio
-    data_file_path = args.data_file_path
-    graph_file_path = args.graph_file_path
-    steps_per_day = args.steps_per_day
-
-    # read data
-    data = np.load(data_file_path)["data"]
+def load_and_preprocess_data():
+    '''Load and preprocess raw data, selecting the specified channel(s).'''
+    data = np.load(data_file_path)['data']
     data = data[..., target_channel]
-    print("raw time series shape: {0}".format(data.shape))
+    print(f'Raw time series shape: {data.shape}')
+    return data
 
-    l, n, f = data.shape
-    num_samples = l - (history_seq_len + future_seq_len) + 1
-    train_num_short = round(num_samples * train_ratio)
-    valid_num_short = round(num_samples * valid_ratio)
-    test_num_short = num_samples - train_num_short - valid_num_short
-    print("number of training samples:{0}".format(train_num_short))
-    print("number of validation samples:{0}".format(valid_num_short))
-    print("number of test samples:{0}".format(test_num_short))
+def add_temporal_features(data):
+    '''Add time of day and day of week as features to the data.'''
+    l, n, _ = data.shape
+    feature_list = [data]
 
-    index_list = []
-    for t in range(history_seq_len, num_samples + history_seq_len):
-        index = (t-history_seq_len, t, t+future_seq_len)
-        index_list.append(index)
-
-    train_index = index_list[:train_num_short]
-    valid_index = index_list[train_num_short: train_num_short + valid_num_short]
-    test_index = index_list[train_num_short +
-                            valid_num_short: train_num_short + valid_num_short + test_num_short]
-
-    scaler = standard_transform
-    data_norm = scaler(data, output_dir, train_index, history_seq_len, future_seq_len)
-
-    # add external feature
-    feature_list = [data_norm]
     if add_time_of_day:
-        # numerical time_of_day
-        tod = [i % steps_per_day /
-               steps_per_day for i in range(data_norm.shape[0])]
-        tod = np.array(tod)
-        tod_tiled = np.tile(tod, [1, n, 1]).transpose((2, 1, 0))
-        feature_list.append(tod_tiled)
+        time_of_day = np.array([i % steps_per_day / steps_per_day for i in range(l)])
+        time_of_day_tiled = np.tile(time_of_day, [1, n, 1]).transpose((2, 1, 0))
+        feature_list.append(time_of_day_tiled)
 
     if add_day_of_week:
-        # numerical day_of_week
-        dow = [(i // steps_per_day) % 7 for i in range(data_norm.shape[0])]
-        dow = np.array(dow)
-        dow_tiled = np.tile(dow, [1, n, 1]).transpose((2, 1, 0))
-        feature_list.append(dow_tiled)
+        day_of_week = np.array([(i // steps_per_day) % 7 / 7 for i in range(l)])
+        day_of_week_tiled = np.tile(day_of_week, [1, n, 1]).transpose((2, 1, 0))
+        feature_list.append(day_of_week_tiled)
 
-    processed_data = np.concatenate(feature_list, axis=-1)
+    data_with_features = np.concatenate(feature_list, axis=-1)  # L x N x C
+    return data_with_features
 
-    # dump data
-    index = {}
-    index["train"] = train_index
-    index["valid"] = valid_index
-    index["test"] = test_index
-    with open(output_dir + "/index_in{0}_out{1}.pkl".format(history_seq_len, future_seq_len), "wb") as f:
-        pickle.dump(index, f)
+def save_data(data):
+    '''Save the preprocessed data to a binary file.'''
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    file_path = os.path.join(output_dir, 'data.dat')
+    fp = np.memmap(file_path, dtype='float32', mode='w+', shape=data.shape)
+    fp[:] = data[:]
+    fp.flush()
+    del fp
+    print(f'Data saved to {file_path}')
 
-    data = {}
-    data["processed_data"] = processed_data
-    with open(output_dir + "/data_in{0}_out{1}.pkl".format(history_seq_len, future_seq_len), "wb") as f:
-        pickle.dump(data, f)
-    # copy adj
-    if os.path.exists(args.graph_file_path):
-        # copy
-        shutil.copyfile(args.graph_file_path, output_dir + "/adj_mx.pkl")
+def save_graph():
+    '''Save the adjacency matrix to the output directory, generating it if necessary.'''
+    output_graph_path = os.path.join(output_dir, 'adj_mx.pkl')
+    if os.path.exists(graph_file_path):
+        shutil.copyfile(graph_file_path, output_graph_path)
     else:
-        # generate and copy
-        generate_adj_pems04()
-        shutil.copyfile(graph_file_path, output_dir + "/adj_mx.pkl")
+        generate_adj()
+        shutil.copyfile(graph_file_path, output_graph_path)
+    print(f'Adjacency matrix saved to {output_graph_path}')
 
+def save_description(data):
+    '''Save a description of the dataset to a JSON file.'''
+    description = {
+        'name': dataset_name,
+        'domain': domain,
+        'shape': data.shape,
+        'num_time_steps': data.shape[0],
+        'num_nodes': data.shape[1],
+        'num_features': data.shape[2],
+        'feature_description': feature_description,
+        'has_graph': graph_file_path is not None,
+        'frequency (minutes)': frequency,
+        'regular_settings': regular_settings
+    }
+    description_path = os.path.join(output_dir, 'desc.json')
+    with open(description_path, 'w') as f:
+        json.dump(description, f, indent=4)
+    print(f'Description saved to {description_path}')
+    print(description)
 
-if __name__ == "__main__":
-    # sliding window size for generating history sequence and target sequence
-    HISTORY_SEQ_LEN = 12
-    FUTURE_SEQ_LEN = 12
+def main():
+    # Load and preprocess data
+    data = load_and_preprocess_data()
 
-    TRAIN_RATIO = 0.6
-    VALID_RATIO = 0.2
-    TARGET_CHANNEL = [0]                   # target channel(s)
-    STEPS_PER_DAY = 288
+    # Add temporal features
+    data_with_features = add_temporal_features(data)
 
-    DATASET_NAME = "PEMS04"
-    TOD = True                  # if add time_of_day feature
-    DOW = True                  # if add day_of_week feature
-    OUTPUT_DIR = "datasets/" + DATASET_NAME
-    DATA_FILE_PATH = "datasets/raw_data/{0}/{0}.npz".format(DATASET_NAME)
-    GRAPH_FILE_PATH = "datasets/raw_data/{0}/adj_{0}.pkl".format(DATASET_NAME)
+    # Save processed data
+    save_data(data_with_features)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output_dir", type=str,
-                        default=OUTPUT_DIR, help="Output directory.")
-    parser.add_argument("--data_file_path", type=str,
-                        default=DATA_FILE_PATH, help="Raw traffic readings.")
-    parser.add_argument("--graph_file_path", type=str,
-                        default=GRAPH_FILE_PATH, help="Raw traffic readings.")
-    parser.add_argument("--history_seq_len", type=int,
-                        default=HISTORY_SEQ_LEN, help="Sequence Length.")
-    parser.add_argument("--future_seq_len", type=int,
-                        default=FUTURE_SEQ_LEN, help="Sequence Length.")
-    parser.add_argument("--steps_per_day", type=int,
-                        default=STEPS_PER_DAY, help="Sequence Length.")
-    parser.add_argument("--tod", type=bool, default=TOD,
-                        help="Add feature time_of_day.")
-    parser.add_argument("--dow", type=bool, default=DOW,
-                        help="Add feature day_of_week.")
-    parser.add_argument("--target_channel", type=list,
-                        default=TARGET_CHANNEL, help="Selected channels.")
-    parser.add_argument("--train_ratio", type=float,
-                        default=TRAIN_RATIO, help="Train ratio")
-    parser.add_argument("--valid_ratio", type=float,
-                        default=VALID_RATIO, help="Validate ratio.")
-    args_metr = parser.parse_args()
+    # Copy or generate and save adjacency matrix
+    save_graph()
 
-    # print args
-    print("-"*(20+45+5))
-    for key, value in sorted(vars(args_metr).items()):
-        print("|{0:>20} = {1:<45}|".format(key, str(value)))
-    print("-"*(20+45+5))
+    # Save dataset description
+    save_description(data_with_features)
 
-    if os.path.exists(args_metr.output_dir):
-        reply = str(input(
-            f"{args_metr.output_dir} exists. Do you want to overwrite it? (y/n)")).lower().strip()
-        if reply[0] != "y":
-            sys.exit(0)
-    else:
-        os.makedirs(args_metr.output_dir)
-    generate_data(args_metr)
+if __name__ == '__main__':
+    main()

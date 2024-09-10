@@ -1,43 +1,25 @@
 import torch
 import numpy as np
 
+from .mse import masked_mse
 
-def masked_mse(preds: torch.Tensor, labels: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
-    """Masked mean squared error.
+def masked_rmse(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
+    """
+    Calculate the Masked Root Mean Squared Error (RMSE) between predicted and target values,
+    ignoring entries in the target tensor that match the specified null value.
+
+    This function is useful for evaluating model performance on datasets where some target values
+    may be missing or irrelevant (denoted by `null_val`). The RMSE provides a measure of the average
+    magnitude of errors, accounting only for the valid, non-null entries.
 
     Args:
-        preds (torch.Tensor): predicted values
-        labels (torch.Tensor): labels
-        null_val (float, optional): null value. Defaults to np.nan.
+        prediction (torch.Tensor): The predicted values as a tensor.
+        target (torch.Tensor): The ground truth values as a tensor with the same shape as `prediction`.
+        null_val (float, optional): The value considered as null or missing in the `target` tensor. 
+            Defaults to `np.nan`. The function will ignore all `NaN` values in the target.
 
     Returns:
-        torch.Tensor: masked mean squared error
+        torch.Tensor: A scalar tensor representing the masked root mean squared error.
     """
 
-    if np.isnan(null_val):
-        mask = ~torch.isnan(labels)
-    else:
-        eps = 5e-5
-        mask = ~torch.isclose(labels, torch.tensor(null_val).expand_as(labels).to(labels.device), atol=eps, rtol=0.)
-    mask = mask.float()
-    mask /= torch.mean((mask))
-    mask = torch.where(torch.isnan(mask), torch.zeros_like(mask), mask)
-    loss = (preds-labels)**2
-    loss = loss * mask
-    loss = torch.where(torch.isnan(loss), torch.zeros_like(loss), loss)
-    return torch.mean(loss)
-
-
-def masked_rmse(preds: torch.Tensor, labels: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
-    """root mean squared error.
-
-    Args:
-        preds (torch.Tensor): predicted values
-        labels (torch.Tensor): labels
-        null_val (float, optional): null value . Defaults to np.nan.
-
-    Returns:
-        torch.Tensor: root mean squared error
-    """
-
-    return torch.sqrt(masked_mse(preds=preds, labels=labels, null_val=null_val))
+    return torch.sqrt(masked_mse(prediction=prediction, target=target, null_val=null_val))

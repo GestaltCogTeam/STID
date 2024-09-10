@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: If you use this software, please cite both the article from preferred-citation and the software itself.
+authors: []
+title: "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate\r\n                  Time Series Forecasting"
+version: 1.0.0
+url: https://doi.org/10.1145/3511808.3557702
+doi: 10.1145/3511808.3557702
+date-released: '2022-09-10'
+preferred-citation:
+  authors: []
+  title: "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate\r\n                  Time Series Forecasting"
+  doi: 10.1145/3511808.3557702
+  url: https://doi.org/10.1145/3511808.3557702
+  type: conference-paper
+  pages: 4454--4458
+  year: '2022'
+  collection-title: "Proceedings of the 31st ACM International Conference on Information\r\n                  \\& Knowledge Management, Atlanta, GA, USA, October 17-21, 2022"
+  conference: {}
+  publisher:
+    name: ACM
